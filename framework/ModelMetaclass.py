@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 import logging
 import Field
 
@@ -18,12 +22,14 @@ class ModelMetaclass(type):
                 mappings[k] = v
                 if v.primary_key:
                     if primaryKey:
-                        raise StandardError('Duplicate primary key for field: %s', k)
+                        raise StandardError(
+                            'Duplicate primary key for field: %s', k)
                     primaryKey = k
                 else:
                     fields.append(k)
         if not primaryKey:
-            raise StandardError('Primary key not found')
+            raise StandardError(
+                'Primary key not found')
         for k in mappings.keys():
             attrs.pop(k)
         escaped_fields = list(map(lambda f: '`%s`' % f, fields))
@@ -44,3 +50,10 @@ class ModelMetaclass(type):
         attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (
             tableName, primaryKey)
         return type.__new__(cls, name, bases, attrs)
+
+
+def create_args_string(num):
+    L = []
+    for n in range(num):
+        L.append('?')
+    return ', '.join(L)
